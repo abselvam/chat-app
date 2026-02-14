@@ -2,9 +2,21 @@
 @plugin "daisyui";
 
 @property --border-angle {
+  syntax: "<angle>";
   inherits: false;
   initial-value: 0deg;
-  syntax: "<angle>";
+}
+
+/* Add your animation keyframes if needed */
+@keyframes rotate-border {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* Your component styles */
+.animate-border {
+  animation: rotate-border 4s linear infinite;
 }
 
 .input {
@@ -24,7 +36,7 @@
 }
 
 .auth-btn {
-  @apply w-full bg-cyan-500 text-white rounded-lg py-2.5 font-medium hover:bg-cyan-600 focus:ring-2 focus:ring-cyan-500;
+  @apply w-full bg-cyan-500 text-white rounded-lg py-2.5 font-medium hover:bg-cyan-600 focus:ring-2 focus:ring-cyan-500 hover:cursor-pointer;
 }
 
 .auth-link {
