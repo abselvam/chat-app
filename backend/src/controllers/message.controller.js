@@ -1,6 +1,7 @@
 import cloudinary from "../lib/cloudinary.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
+import { io, getReceiverSocketId } from "../lib/socket.js";
 
 export const getAllContacts = async (req, res) => {
   try {
@@ -40,13 +41,13 @@ export const sendMessage = async (req, res) => {
     const myId = req.user._id;
     const { text, image } = req.body;
 
-    if (!image || !text) {
+    if (!image && !text) {
       return res.status(400).json({ message: "text or image is required" });
     }
     if (myId.equals(id)) {
       return res.status(400).json({ message: "Cannot message yourself" });
     }
-    receiverExists = await User.exists({ _id: id });
+    const receiverExists = await User.exists({ _id: id });
     if (!receiverExists) {
       return res
         .status(404)
@@ -67,6 +68,11 @@ export const sendMessage = async (req, res) => {
     });
 
     await newMessage.save();
+
+    const receiverSocketId = getReceiverSocketId(id);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
 
     res.status(201).json(newMessage);
   } catch (error) {
